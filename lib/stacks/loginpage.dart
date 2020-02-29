@@ -1,5 +1,7 @@
+import 'package:DrInK/components/footer.dart';
 import 'package:flutter/material.dart';
 import '../components/buildlogo.dart';
+import '../components/question.dart';
 
 class Login extends StatefulWidget {
   Login({this.checkCredentials, this.goToRegister});
@@ -82,20 +84,20 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     double paddingTop = MediaQuery.of(context).padding.top;
     double deviceHeight = MediaQuery.of(context).size.height;
+    double deviceWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       key: _scaffoldKey,
-      body: Center(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Container(
+          width: deviceWidth,
           child: Column(
             children: <Widget>[
               SizedBox(
-                height: paddingTop,
-              ),
-              SizedBox(
-                height: deviceHeight * 0.1,
+                height: paddingTop * 3,
               ),
               BuildLogo(),
-              SizedBox(height: deviceHeight * 0.06),
+              SizedBox(height: paddingTop * 2),
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.7,
                 child: Column(
@@ -142,7 +144,8 @@ class _LoginState extends State<Login> {
                 onPressed: null,
               ),
               FlatButton(
-                padding: EdgeInsets.symmetric(horizontal: deviceHeight * 0.1),
+                padding:
+                    EdgeInsets.symmetric(horizontal: deviceHeight * 0.1),
                 child: _loading
                     ? SizedBox(
                         height: 20,
@@ -175,15 +178,8 @@ class _LoginState extends State<Login> {
                 width: MediaQuery.of(context).size.width * 0.7,
                 height: deviceHeight * 0.04,
               ),
-              Padding(
-                child: Text(
-                  "Don't have an account yet?",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.black.withOpacity(0.5),
-                  ),
-                ),
-                padding: EdgeInsets.only(top: deviceHeight * 0.02),
+              Question(
+                question: "Don't have an account yet?",
               ),
               FlatButton(
                 child: Text(
@@ -198,13 +194,7 @@ class _LoginState extends State<Login> {
                   widget.goToRegister();
                 },
               ),
-              Text(
-                "DrInK - Drinking Information Kit",
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.black.withOpacity(0.2),
-                ),
-              ),
+              Footer(text: "DrInK - Drinking Water Information Kit"),
             ],
           ),
         ),

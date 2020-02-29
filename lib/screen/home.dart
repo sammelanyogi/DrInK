@@ -51,9 +51,9 @@ class _HomeState extends State<Home> {
                   ],
                 )),
             Container(
-              margin: EdgeInsets.only(top: paddingTop),
-              height: deviceHeight * 0.6,
-              width: deviceWidth - paddingTop * 2,
+              margin: EdgeInsets.only(top: paddingTop, bottom:  deviceHeight> deviceWidth? 0: paddingTop*3),
+              height:  deviceHeight> deviceWidth? deviceHeight * 0.6 : deviceWidth*0.6,
+              width: deviceHeight> deviceWidth? deviceWidth - paddingTop * 2: deviceWidth- paddingTop*6,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),

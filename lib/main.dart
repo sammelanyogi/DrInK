@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart';
 import 'prepage.dart';
 import 'apppage.dart';
 
-void main() => runApp(MyApp());
-const loginUrl = "https://server.omhit.com/login";
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(MyApp());
+  });
+}
 
 class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
@@ -12,7 +17,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _auth = false;
-  Future<http.Response> login;
 
   void _signInDone() {
     setState(() {

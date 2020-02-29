@@ -1,4 +1,4 @@
-import 'package:drinkwater/components/numdata.dart';
+import '../components/numdata.dart';
 import 'package:flutter/material.dart';
 import '../components/InputData.dart';
 import 'dart:io';
