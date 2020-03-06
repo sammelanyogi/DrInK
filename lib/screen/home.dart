@@ -10,7 +10,6 @@ class _HomeState extends State<Home> {
     print("you have learned more");
   }
 
-
   @override
   Widget build(BuildContext context) {
     double paddingTop = MediaQuery.of(context).padding.top;
@@ -51,9 +50,15 @@ class _HomeState extends State<Home> {
                   ],
                 )),
             Container(
-              margin: EdgeInsets.only(top: paddingTop, bottom:  deviceHeight> deviceWidth? 0: paddingTop*3),
-              height:  deviceHeight> deviceWidth? deviceHeight * 0.6 : deviceWidth*0.6,
-              width: deviceHeight> deviceWidth? deviceWidth - paddingTop * 2: deviceWidth- paddingTop*6,
+              margin: EdgeInsets.only(
+                  top: paddingTop,
+                  bottom: deviceHeight > deviceWidth ? 0 : paddingTop * 3),
+              height: deviceHeight > deviceWidth
+                  ? deviceHeight * 0.6
+                  : deviceWidth * 0.6,
+              width: deviceHeight > deviceWidth
+                  ? deviceWidth - paddingTop * 2
+                  : deviceWidth - paddingTop * 6,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
@@ -78,83 +83,85 @@ class _HomeState extends State<Home> {
                     colors: [Colors.white.withOpacity(0.4), Colors.white],
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(
-                          top: deviceHeight * 0.1,
-                          left: paddingTop,
-                          bottom: deviceHeight * 0.06),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "Welcome",
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 40,
-                              fontWeight: FontWeight.bold,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: deviceHeight * 0.1,
+                            left: paddingTop,
+                            bottom: deviceHeight * 0.06),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              "Welcome",
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Text(
-                            "to DrInk",
-                            style: TextStyle(
-                              color: Colors.black45,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
+                            Text(
+                              "to DrInk",
+                              style: TextStyle(
+                                color: Colors.black45,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                          Text(
-                            "Drink Water Information Kit",
-                            style: TextStyle(
-                              color: Colors.black45,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
+                            Text(
+                              "Drink Water Information Kit",
+                              style: TextStyle(
+                                color: Colors.black45,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.only(left: paddingTop, right: paddingTop),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "Hello there the angel from my ightmare the shadow on the background of the morgue the unsuspecting victom from the darkness in the valley haha",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.black54,
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: paddingTop, right: paddingTop),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              "Hello there the angel from my ightmare the shadow on the background of the morgue the unsuspecting victom from the darkness in the valley haha",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black54,
+                              ),
                             ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Padding(
-                                padding:
-                                    EdgeInsets.symmetric(vertical: paddingTop),
-                                child: FlatButton(
-                                  onPressed: _openLearnMore,
-                                  color: Colors.green,
-                                  child: Text(
-                                    "    Learn more about DrInK    ",
-                                    style: TextStyle(
-                                      color: Colors.white,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: paddingTop),
+                                  child: FlatButton(
+                                    onPressed: _openLearnMore,
+                                    color: Colors.green,
+                                    child: Text(
+                                      "    Learn more about DrInK    ",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
                                     ),
                                   ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                  ),
-                                ),
-                              )
-                            ],
-                          )
-                        ],
+                                )
+                              ],
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

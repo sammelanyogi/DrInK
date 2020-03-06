@@ -40,14 +40,7 @@ class _LoginState extends State<Login> {
     }
     if (statusCode == 400 || statusCode == 401) {
       print("There was an error");
-      _error = "Username and password mismatch.";
-      // SnackBar snackBar = SnackBar(
-      //     content: Text("Error in username or password."),
-      //     action: SnackBarAction(
-      //       label: "Okay",
-      //       onPressed: () {},
-      //     ));
-      // _scaffoldKey.currentState.showSnackBar(snackBar);
+      _error = "Error in Email or Password.";
     }
 
     if (statusCode == 200) {
@@ -106,7 +99,7 @@ class _LoginState extends State<Login> {
                       keyboardType: TextInputType.emailAddress,
                       controller: emailControl,
                       decoration: InputDecoration(
-                        hintText: 'Phone number/Email',
+                        hintText: 'Email',
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -144,8 +137,7 @@ class _LoginState extends State<Login> {
                 onPressed: null,
               ),
               FlatButton(
-                padding:
-                    EdgeInsets.symmetric(horizontal: deviceHeight * 0.1),
+                padding: EdgeInsets.symmetric(horizontal: deviceHeight * 0.1),
                 child: _loading
                     ? SizedBox(
                         height: 20,
@@ -194,11 +186,12 @@ class _LoginState extends State<Login> {
                   widget.goToRegister();
                 },
               ),
-              Footer(text: "DrInK - Drinking Water Information Kit"),
             ],
           ),
         ),
       ),
+      bottomNavigationBar:
+          Footer(text: "DrInK - Drinking Water Information Kit"),
     );
   }
 }

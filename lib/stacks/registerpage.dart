@@ -129,10 +129,12 @@ class _RegisterState extends State<Register> {
                   widget.goToLogin();
                 },
               ),
-              Footer(text: "DrInK - Drinking Water Information Toolkit")
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: Footer(
+        text: "DrInK - Drinking Water Information Kit",
       ),
     );
   }

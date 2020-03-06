@@ -11,14 +11,25 @@ class Footer extends StatefulWidget {
 class FooterState extends State<Footer> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.only(top:25, bottom:20),
-        child: Text(
-        widget.text,
-        style: TextStyle(
-          fontSize: 15,
-          color: widget.color==null? Colors.black.withOpacity(0.2): widget.color,
-        ),
+    return BottomAppBar(
+      color: Colors.white12,
+      elevation: 0,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(top: 20, bottom: 20),
+            child: Text(
+              widget.text,
+              style: TextStyle(
+                fontSize: 15,
+                color: widget.color == null
+                    ? Colors.black.withOpacity(0.2)
+                    : widget.color,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -86,7 +86,9 @@ class _LoginPageState extends State<LoginPage> {
       context,
       MaterialPageRoute(
         builder: (context) => Login(
-            checkCredentials: checkForCredentials, goToRegister: goToRegister),
+          checkCredentials: checkForCredentials,
+          goToRegister: goToRegister,
+        ),
       ),
     );
   }
@@ -103,77 +105,77 @@ class _LoginPageState extends State<LoginPage> {
     double paddingTop = MediaQuery.of(context).padding.top;
     double deviceWidth = MediaQuery.of(context).size.width;
     double deviceHeight = MediaQuery.of(context).size.height;
-    return Scaffold(
-      body: Stack(children: <Widget>[
-        Container(
-          height: deviceHeight,
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          fit: BoxFit.cover,
+          image: AssetImage('assets/images/precover.jpg'),
+        ),
+      ),
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white60,
+        body: Container(
           width: deviceWidth,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              fit: BoxFit.cover,
-              image: AssetImage('assets/images/precover.jpg'),
-            ),
-          ),
-          child: Container(
-            height: deviceHeight,
-            width: deviceWidth,
-            decoration: BoxDecoration(color: Colors.white60),
-          ),
-        ),
-        SingleChildScrollView(
-          child: Container(
-            width: deviceWidth,
-            child: Column(
-              children: <Widget>[
-                SizedBox(
-                  height: paddingTop * 3,
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                height: paddingTop * 3,
+              ),
+              BuildLogo(),
+              Container(
+                margin: EdgeInsets.only(top: paddingTop * 2),
+                width: deviceWidth * 0.65,
+                child: SocialButtons(
+                  google: socialTypeGoogle,
+                  facebook: socialTypeFacebook,
                 ),
-                BuildLogo(),
-                Container(
-                  margin: EdgeInsets.only(top: paddingTop * 2),
-                  width: deviceWidth * 0.65,
-                  child: SocialButtons(
-                    google: socialTypeGoogle,
-                    facebook: socialTypeFacebook,
+              ),
+              SizedBox(
+                child: Divider(color: Colors.black.withOpacity(0.5)),
+                width: deviceWidth * 0.7,
+                height: deviceHeight * 0.08,
+              ),
+              FlatButton(
+                child: Text(
+                  "Create an Account",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
                   ),
                 ),
-                SizedBox(
-                  child: Divider(color: Colors.black.withOpacity(0.5)),
-                  width: deviceWidth * 0.7,
-                  height: deviceHeight * 0.08,
+                onPressed: goToRegister,
+                color: Colors.green,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0)),
+              ),
+              Question(question: "Already have an Account?"),
+              FlatButton(
+                child: Text(
+                  "Login",
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: Colors.blueAccent,
+                  ),
                 ),
-                FlatButton(
-                  child: Text(
-                    "Create an Account",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
+                onPressed: goToLogin,
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding:  EdgeInsets.all(20.0),
+                    child: Text(
+                      "DrInK - Drinking Water Information Kit",
+                      style: TextStyle(color: Colors.black54),
                     ),
                   ),
-                  onPressed: goToRegister,
-                  color: Colors.green,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0)),
                 ),
-                Question(question: "Already have an Account?"),
-                FlatButton(
-                  child: Text(
-                    "Login",
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: Colors.blueAccent,
-                    ),
-                  ),
-                  onPressed: goToLogin,
-                ),
-                Footer(
-                    text: "DrInK - Drinking Water Information Kit",
-                    color: Colors.black54)
-              ],
-            ),
+              )
+            ],
           ),
         ),
-      ]),
+      ),
     );
   }
 }

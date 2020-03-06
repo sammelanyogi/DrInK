@@ -55,12 +55,14 @@ class _AppPageState extends State<AppPage> {
     if(keyboardOpen){
       return SizedBox();
     }
-    return _selectedIndex == 1 ? FloatingActionButton.extended(
-      onPressed: submitData,
-      label: Text("Submit"),
-      icon: Icon(Icons.send),
-      backgroundColor: Colors.green,
-    ): FloatingActionButton.extended(
+    return _selectedIndex == 1 ? SizedBox()
+    // FloatingActionButton.extended(
+    //   onPressed: submitData,
+    //   label: Text("Submit"),
+    //   icon: Icon(Icons.send),
+    //   backgroundColor: Colors.green,
+    // )
+    : FloatingActionButton.extended(
       onPressed: () {
         setState(() {
           _selectedIndex = 1;
