@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../components/InputData.dart';
 
 class NumData extends StatefulWidget {
@@ -35,14 +36,13 @@ class _NumDataState extends State<NumData> {
             ListTile(
               title: Text(option),
               leading: Radio(
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 value: Presence.values[widget.options.indexOf(option)],
                 groupValue: _character,
                 onChanged: (Presence value) {
                   setState(() {
                     _character = value;
-                    print(_character);
                   });
+                  widget.dataBack(FinalData(widget.id, value));
                 },
               ),
             ),
@@ -57,7 +57,6 @@ class _NumDataState extends State<NumData> {
           contentPadding: EdgeInsets.symmetric(vertical: 0),
         ),
         onChanged: (value) {
-          print("hello this is ${widget.id}");
           widget.dataBack(FinalData(widget.id, value));
         },
       );
@@ -66,13 +65,13 @@ class _NumDataState extends State<NumData> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(MediaQuery.of(context).padding.top * 0.5),
+      padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).padding.top * 0.5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
             widget.heading,
-            style: TextStyle(fontWeight: FontWeight.w600),
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
           ),
           buildField(),
         ],

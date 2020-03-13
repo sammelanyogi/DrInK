@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import './components/InputData.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'screen/profile.dart';
@@ -21,6 +22,11 @@ List<InputData> inputs = [
       textPlace: "Enter TDS value"),
   InputData(
       id: "ntu", heading: "Turbidity (NTU)", textPlace: "Enter the NTU value"),
+  InputData.radio(
+      id: 'ecolis',
+      options: ["Present", "Absent", "N/A"],
+      heading: "Presence or Absence of Fecal Coliforms (E-Coli)",
+      radio: true),
   InputData(
       id: "ecoli", heading: "E-Coli Count", textPlace: "Enter count value"),
   InputData(
@@ -29,7 +35,7 @@ List<InputData> inputs = [
       textPlace: "Enter FRC"),
   InputData.text(
       id: "other",
-      heading: "Other Parameter",
+      heading: "Other Parameters",
       textPlace: "Specify if there are any other parameters"),
 ];
 
@@ -51,12 +57,6 @@ class _AppPageState extends State<AppPage> {
     }
     return _selectedIndex == 1
         ? SizedBox()
-        // FloatingActionButton.extended(
-        //   onPressed: submitData,
-        //   label: Text("Submit"),
-        //   icon: Icon(Icons.send),
-        //   backgroundColor: Colors.green,
-        // )
         : FloatingActionButton.extended(
             onPressed: () {
               setState(() {
@@ -64,7 +64,7 @@ class _AppPageState extends State<AppPage> {
                 _myPage.jumpToPage(1);
               });
             },
-            label: Text("Enter Data"),
+            label: Text("Enter Data", style: GoogleFonts.poppins(),),
             icon: Icon(Icons.add),
             backgroundColor: Color(0xff30cbef),
           );

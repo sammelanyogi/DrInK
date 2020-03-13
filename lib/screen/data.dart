@@ -1,5 +1,8 @@
+import 'dart:ffi';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../components/numdata.dart';
 import 'package:flutter/material.dart';
@@ -40,8 +43,8 @@ class DataCol extends StatefulWidget {
 String address;
 
 class _DataColState extends State<DataCol> {
-  int ph, ec, temp, tds, ntu, ecoli, frc;
-  String other;
+  double ph, ec, temp, tds, ntu, ecoli, frc;
+  String other, ecolis;
   String address, supplyChain;
   String obDetails;
   bool loading = false;
@@ -50,31 +53,35 @@ class _DataColState extends State<DataCol> {
     print("The value of ${data.id} is ${data.value}.");
     if (data.id == "ph") {
       print("HAHEHA");
-      ph = int.parse(data.value);
+      ph = double.parse(data.value);
       print(ph);
     }
     if (data.id == "ec") {
-      ec = int.parse(data.value);
+      ec = double.parse(data.value);
       print(ec);
     }
     if (data.id == "temp") {
-      temp = int.parse(data.value);
+      temp = double.parse(data.value);
       print(temp);
     }
     if (data.id == "tds") {
-      tds = int.parse(data.value);
+      tds = double.parse(data.value);
       print(tds);
     }
     if (data.id == "ntu") {
-      ntu = int.parse(data.value);
+      ntu = double.parse(data.value);
       print(ntu);
     }
+    if (data.id == "ecolis") {
+      ecolis = data.value.toString();
+      print(ecolis);
+    }
     if (data.id == "ecoli") {
-      ecoli = int.parse(data.value);
+      ecoli = double.parse(data.value);
       print(ecoli);
     }
     if (data.id == "frc") {
-      frc = int.parse(data.value);
+      frc = double.parse(data.value);
       print(frc);
     }
     if (data.id == "other") {
@@ -105,6 +112,18 @@ class _DataColState extends State<DataCol> {
         address == null ||
         supplyChain == null ||
         obDetails == null) {
+      setState(() {
+        loading = false;
+      });
+      SnackBar snackBar = SnackBar(
+        backgroundColor: Colors.pink,
+        content: Text("Enter all data. Cannot submit now."),
+        action: SnackBarAction(
+          label: "Okay",
+          onPressed: () {},
+        ),
+      );
+      widget.scakey.currentState.showSnackBar(snackBar);
       error = "please fill up all data.";
     } else {
       dataB = await submitWholeData(waterUrl, {
@@ -116,6 +135,7 @@ class _DataColState extends State<DataCol> {
           'temp': temp,
           'tds': tds,
           'ntu': ntu,
+          'ecolis': ecolis,
           'ecoli': ecoli,
           'frc': frc,
           'other': other
@@ -139,6 +159,15 @@ class _DataColState extends State<DataCol> {
         setState(() {
           loading = false;
         });
+        SnackBar snackBar = SnackBar(
+          backgroundColor: Colors.pink,
+          content: Text("There was an error while submiting data."),
+          action: SnackBarAction(
+            label: "Okay",
+            onPressed: () {},
+          ),
+        );
+        widget.scakey.currentState.showSnackBar(snackBar);
       }
     }
   }
@@ -200,7 +229,7 @@ class _DataColState extends State<DataCol> {
           pinned: true,
           expandedHeight: deviceHeight * 0.2,
           flexibleSpace: FlexibleSpaceBar(
-            title: Text('Data Collection'),
+            title: Text('Data Collection', style: GoogleFonts.merriweather(),),
             centerTitle: true,
           ),
         ),
@@ -211,11 +240,11 @@ class _DataColState extends State<DataCol> {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.symmetric(
-                      horizontal: statusBarHeight,
+                      horizontal: statusBarHeight*0.5,
                       vertical: statusBarHeight * 0.5),
                   child: Text(
                     "Status Parameters",
-                    style: TextStyle(
+                    style: GoogleFonts.notoSerif(
                         color: Colors.blue,
                         fontSize: 20,
                         fontWeight: FontWeight.bold),
@@ -224,13 +253,13 @@ class _DataColState extends State<DataCol> {
                 Padding(
                   padding: EdgeInsets.symmetric(
                       vertical: statusBarHeight * 0.5,
-                      horizontal: statusBarHeight * 1.5),
+                      horizontal: statusBarHeight ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
                         "Survey Location",
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
                       ),
                       Row(
                         children: <Widget>[
@@ -259,13 +288,13 @@ class _DataColState extends State<DataCol> {
                 Padding(
                   padding: EdgeInsets.symmetric(
                       vertical: statusBarHeight * 0.5,
-                      horizontal: statusBarHeight * 1.5),
+                      horizontal: statusBarHeight ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
                         "Water Supply Chain",
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
                       ),
                       TextFormField(
                         keyboardType: TextInputType.text,
@@ -282,11 +311,11 @@ class _DataColState extends State<DataCol> {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(
-                      horizontal: statusBarHeight,
+                      horizontal: statusBarHeight*0.5,
                       vertical: statusBarHeight * 0.5),
                   child: Text(
                     "Observation Parameters",
-                    style: TextStyle(
+                    style: GoogleFonts.notoSerif(
                         color: Colors.blue,
                         fontSize: 20,
                         fontWeight: FontWeight.bold),
@@ -297,13 +326,13 @@ class _DataColState extends State<DataCol> {
                   children: <Widget>[
                     Padding(
                       padding: EdgeInsets.symmetric(
-                          horizontal: statusBarHeight * 1.5),
+                          horizontal: statusBarHeight ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
                             "Observation Details",
-                            style: TextStyle(fontWeight: FontWeight.w600),
+                            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
                           ),
                           Card(
                             child: Padding(
@@ -321,49 +350,49 @@ class _DataColState extends State<DataCol> {
                               ),
                             ),
                           ),
-                          Center(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: statusBarHeight),
-                              child: Column(
-                                children: <Widget>[
-                                  Text(
-                                    "Select Image",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w600),
-                                  ),
-                                  Container(
-                                    constraints: BoxConstraints(
-                                        maxWidth: deviceWidth * 0.7),
-                                    child: _image == null
-                                        ? Text("No Image Selected.")
-                                        : Image.file(_image),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      IconButton(
-                                        icon: Icon(Icons.image),
-                                        onPressed: getImageFromGallery,
-                                      ),
-                                      IconButton(
-                                        icon: Icon(Icons.add_a_photo),
-                                        onPressed: openCameraForImage,
-                                      ),
-                                      IconButton(
-                                        icon: Icon(Icons.delete),
-                                        onPressed: () {
-                                          setState(() {
-                                            _image = null;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
+                          // Center(
+                          //   child: Padding(
+                          //     padding: EdgeInsets.symmetric(
+                          //         vertical: statusBarHeight),
+                          //     child: Column(
+                          //       children: <Widget>[
+                          //         Text(
+                          //           "Select Image",
+                          //           style:
+                          //               TextStyle(fontWeight: FontWeight.w600),
+                          //         ),
+                          //         Container(
+                          //           constraints: BoxConstraints(
+                          //               maxWidth: deviceWidth * 0.7),
+                          //           child: _image == null
+                          //               ? Text("No Image Selected.")
+                          //               : Image.file(_image),
+                          //         ),
+                          //         Row(
+                          //           mainAxisAlignment: MainAxisAlignment.center,
+                          //           children: <Widget>[
+                          //             IconButton(
+                          //               icon: Icon(Icons.image),
+                          //               onPressed: getImageFromGallery,
+                          //             ),
+                          //             IconButton(
+                          //               icon: Icon(Icons.add_a_photo),
+                          //               onPressed: openCameraForImage,
+                          //             ),
+                          //             IconButton(
+                          //               icon: Icon(Icons.delete),
+                          //               onPressed: () {
+                          //                 setState(() {
+                          //                   _image = null;
+                          //                 });
+                          //               },
+                          //             ),
+                          //           ],
+                          //         )
+                          //       ],
+                          //     ),
+                          //   ),
+                          // )
                         ],
                       ),
                     ),
@@ -371,11 +400,11 @@ class _DataColState extends State<DataCol> {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(
-                      horizontal: statusBarHeight,
+                      horizontal: statusBarHeight*0.5,
                       vertical: statusBarHeight * 0.5),
                   child: Text(
                     "Water Quality parameters",
-                    style: TextStyle(
+                    style: GoogleFonts.notoSerif(
                         color: Colors.blue,
                         fontSize: 20,
                         fontWeight: FontWeight.bold),
@@ -405,7 +434,14 @@ class _DataColState extends State<DataCol> {
                   child: FlatButton(
                     color: Colors.green,
                     child: loading
-                        ? CircularProgressIndicator()
+                        ? SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
                         : Text(
                             "Submit",
                             style: TextStyle(color: Colors.white),

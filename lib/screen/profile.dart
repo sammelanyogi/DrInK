@@ -2,13 +2,34 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../stacks/profilesetting.dart';
+import 'package:http/http.dart' as http;
 
 class Profile extends StatefulWidget {
   Profile({this.logout});
   final VoidCallback logout;
   @override
   _ProfileState createState() => _ProfileState();
+}
+
+const apiUrl = "http://192.168.1.79:3000/dataCollected";
+Future<http.Response> dataApi(String url, Map jsonMap) async {
+  http.Response response;
+  print(json.encode(jsonMap));
+  try {
+    response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: utf8.encode(
+        json.encode(jsonMap),
+      ),
+    );
+  } catch (e) {
+    print(e.toString());
+    response = null;
+  }
+  return response;
 }
 
 class _ProfileState extends State<Profile> {
@@ -26,13 +47,25 @@ class _ProfileState extends State<Profile> {
     });
   }
 
+  int dataCol;
+  http.Response response;
   loadUserData() async {
     var data = await storage.read(key: 'drinkUserInfo');
     setState(() {
       userData = json.decode(data);
     });
-
+    bringdata();
     print(userData);
+  }
+
+  bringdata() async {
+    response = await dataApi(apiUrl, {'email': userData['email']});
+    if (response != null) {
+      print(response.body);
+      setState(() {
+        dataCol = json.decode(response.body)['number'];
+      });
+    }
   }
 
   @override
@@ -63,13 +96,7 @@ class _ProfileState extends State<Profile> {
                   IconButton(
                     color: Colors.white,
                     icon: Icon(Icons.settings),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Settings(),
-                          ));
-                    },
+                    onPressed: () {},
                   ),
                 ],
               ),
@@ -107,14 +134,14 @@ class _ProfileState extends State<Profile> {
                           ),
                           Text(
                             userData == null ? "..." : userData['name'],
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Color(0xfff7931e),
                               fontSize: 25,
                             ),
                           ),
                           Text(
                             userData == null ? "..." : userData['type'],
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Color(0xff898989),
                               fontSize: 20,
                             ),
@@ -126,7 +153,7 @@ class _ProfileState extends State<Profile> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
                               Text(
-                                userData == null ? "...": "${userData['dataCollected']}",
+                                dataCol == null ? "..." : "$dataCol",
                                 style: TextStyle(
                                   color: Color(0xff5b5b5b),
                                   fontSize: 40,
@@ -212,7 +239,7 @@ class _ProfileState extends State<Profile> {
                             color: Colors.white,
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                              fit: BoxFit.cover,
+                              fit: BoxFit.contain,
                               image: AssetImage('assets/images/avatar.png'),
                             )),
                       ),

@@ -8,7 +8,7 @@ class InputData {
   InputData({this.id, this.heading, this.textPlace}) ;
   InputData.radio({this.id, this.heading,  this.radio, this.options});
 
-  InputData.text({this.id ,this.heading, this.textPlace});
+  InputData.text({this.id ,this.heading, this.textPlace, this.text=true});
 }
 
 class FinalData {

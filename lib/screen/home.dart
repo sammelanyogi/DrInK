@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -41,8 +42,8 @@ class _HomeState extends State<Home> {
                     ),
                     Text(
                       "  DrInK",
-                      style: TextStyle(
-                        fontSize: 25,
+                      style: GoogleFonts.merriweather(
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -97,23 +98,23 @@ class _HomeState extends State<Home> {
                           children: <Widget>[
                             Text(
                               "Welcome",
-                              style: TextStyle(
+                              style:  GoogleFonts.merriweather(
                                 color: Colors.blue,
                                 fontSize: 40,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              "to DrInk",
-                              style: TextStyle(
+                              "to DrInK",
+                              style:  GoogleFonts.poppins(
                                 color: Colors.black45,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                             Text(
-                              "Drink Water Information Kit",
-                              style: TextStyle(
+                              "Drinking Water Information Kit",
+                              style: GoogleFonts.poppins(
                                 color: Colors.black45,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w500,
@@ -129,8 +130,8 @@ class _HomeState extends State<Home> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              "Hello there the angel from my ightmare the shadow on the background of the morgue the unsuspecting victom from the darkness in the valley haha",
-                              style: TextStyle(
+                              "This platform is designed to collect, store, transfer and share information on drinking water supply and quality monitoring.",
+                              style: GoogleFonts.notoSerif(
                                 fontSize: 18,
                                 color: Colors.black54,
                               ),
@@ -146,7 +147,7 @@ class _HomeState extends State<Home> {
                                     color: Colors.green,
                                     child: Text(
                                       "    Learn more about DrInK    ",
-                                      style: TextStyle(
+                                      style: GoogleFonts.poppins(
                                         color: Colors.white,
                                       ),
                                     ),
