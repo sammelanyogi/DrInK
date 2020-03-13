@@ -1,6 +1,6 @@
-import 'package:DrInK/components/footer.dart';
 import 'package:DrInK/components/socialbuttons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
@@ -9,11 +9,12 @@ import 'components/question.dart';
 import 'stacks/loginpage.dart';
 import 'stacks/registerpage.dart';
 
-const loginUrl = "https://server.omhit.com/login";
+const loginUrl = "http://192.168.1.79:3000/login";
 
 class LoginPage extends StatefulWidget {
-  LoginPage({this.signedIn});
+  LoginPage({this.signedIn, this.userData});
   final VoidCallback signedIn;
+  final Function(List<String>) userData;
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -24,9 +25,7 @@ Future<http.Response> loginRequest(String url, Map jsonMap) async {
     response = await http.post(
       Uri.parse(url),
       headers: {'Content-Type': 'application/json'},
-      body: utf8.encode(
-        json.encode(jsonMap),
-      ),
+      body: json.encode(jsonMap),
     );
   } catch (e) {
     print(e.toString());
@@ -38,19 +37,23 @@ Future<http.Response> loginRequest(String url, Map jsonMap) async {
 class _LoginPageState extends State<LoginPage> {
   http.Response loginReturn;
   int userType = 3;
+  final storage = FlutterSecureStorage();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   GoogleSignIn _googleSignIn = GoogleSignIn(scopes: [
     'email',
     'https://www.googleapis.com/auth/contacts.readonly',
   ]);
   Future<int> checkForCredentials(List<String> credentials) async {
     loginReturn = await loginRequest(
-        loginUrl, {'email': credentials[0], 'password': credentials[1]});
+      loginUrl,
+      {'email': credentials[0], 'password': credentials[1]},
+    );
     if (loginReturn == null) {
       return 1000;
     }
     print(loginReturn.body);
-    print("The Status code is " + loginReturn.statusCode.toString());
     if (loginReturn.statusCode == 200) {
+      storage.write(key: 'drinkUserInfo', value: loginReturn.body);
       _goToMain();
     }
     return loginReturn.statusCode;
@@ -96,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
   void goToRegister() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Register(goToLogin: goToLogin)),
+      MaterialPageRoute(builder: (context) => Register(goToLogin: goToLogin, scakey: _scaffoldKey)),
     );
   }
 
@@ -113,6 +116,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
       child: Scaffold(
+        key: _scaffoldKey,
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white60,
         body: Container(
@@ -164,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
-                    padding:  EdgeInsets.all(20.0),
+                    padding: EdgeInsets.all(20.0),
                     child: Text(
                       "DrInK - Drinking Water Information Kit",
                       style: TextStyle(color: Colors.black54),

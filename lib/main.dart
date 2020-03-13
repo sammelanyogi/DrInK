@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'prepage.dart';
 import 'apppage.dart';
 
@@ -16,21 +17,36 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _auth = false;
+  final storage = FlutterSecureStorage();
+  String jwt;
+  bool _auth;
+  bool loading = true;
+  Future<bool> auth() async {
+    jwt = await storage.read(key: 'drinkUserInfo');
+    if (jwt == null) {
+      return false;
+    } else
+      return true;
+  }
 
-  void _signInDone() {
+  void _signInDone() async {
     setState(() {
       _auth = true;
     });
   }
 
-  void _signOutDone() {
+  _signOutDone() {
+    print("THis is jwt");
+    print(jwt);
+    storage.delete(key: 'drinkUserInfo');
+
     setState(() {
       _auth = false;
     });
   }
 
-  Widget getPage() {
+  Future<Widget> getPage() async {
+    _auth = await auth();
     if (_auth)
       return AppPage(logout: _signOutDone);
     else
@@ -45,7 +61,32 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: getPage(),
+      home: FutureBuilder<Widget>(
+          future: getPage(),
+          builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+            if (snapshot.hasData) {
+              return snapshot.data;
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Column(
+                  children: <Widget>[
+                    Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 60,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text('Error: ${snapshot.error}'),
+                    )
+                  ],
+                ),
+              );
+            } else
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+          }),
       debugShowCheckedModeBanner: false,
     );
   }

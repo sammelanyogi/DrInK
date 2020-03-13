@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
 class RegisterLast extends StatefulWidget {
-  RegisterLast({this.getData});
-  final Function(List<String>) getData;
+  RegisterLast({this.getPassData, this.error});
+  final String error;
+  final Function(List<String>) getPassData;
   @override
   _RegisterLastState createState() => _RegisterLastState();
 }
 
 class _RegisterLastState extends State<RegisterLast> {
-  List<String> _data;
+  List<String> pass;
+  String pass1, pass2;
+  String error;
   bool _passwordVisible = false;
   _togglePass() {
     setState(() {
@@ -34,22 +37,17 @@ class _RegisterLastState extends State<RegisterLast> {
             ),
             obscureText: !_passwordVisible,
             onChanged: (value) {
-              setState(() {
-                _data[0] = value;
-              });
-              widget.getData(_data);
+              pass1= value;
+              widget.getPassData([pass1, pass2]);
             },
           ),
           TextFormField(
             decoration: InputDecoration(
-              hintText: 'Verify Password',
-            ),
+                hintText: 'Verify Password', errorText: widget.error),
             obscureText: !_passwordVisible,
             onChanged: (value) {
-              setState(() {
-                _data[1] = value;
-              });
-              widget.getData(_data);
+              pass2= value;
+              widget.getPassData([pass1, pass2]);
             },
           ),
         ],

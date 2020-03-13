@@ -16,26 +16,19 @@ List<InputData> inputs = [
       heading: "Temperature",
       textPlace: "Enter Temperature in degree celcius"),
   InputData(
-      id: "temp",
+      id: "tds",
       heading: "Total Dissolved Solids (TDS)",
       textPlace: "Enter TDS value"),
   InputData(
       id: "ntu", heading: "Turbidity (NTU)", textPlace: "Enter the NTU value"),
-  InputData.radio(
-      id: "ecolia",
-      heading: "Presence or Absence of Fecal Coliforms (E-Coli)",
-      radio: true,
-      options: ["Present", "Absent", "N/A"]),
   InputData(
-      id: "ecolicount",
-      heading: "E-Coli Count",
-      textPlace: "Enter count value"),
+      id: "ecoli", heading: "E-Coli Count", textPlace: "Enter count value"),
   InputData(
       id: "frc",
       heading: "Free Residual Chlorine (FRC)",
       textPlace: "Enter FRC"),
   InputData.text(
-      id: "oth",
+      id: "other",
       heading: "Other Parameter",
       textPlace: "Specify if there are any other parameters"),
 ];
@@ -51,29 +44,32 @@ class _AppPageState extends State<AppPage> {
   void _logout() {
     widget.logout();
   }
-  Widget buildFloatingButton(){
-    if(keyboardOpen){
+
+  Widget buildFloatingButton() {
+    if (keyboardOpen) {
       return SizedBox();
     }
-    return _selectedIndex == 1 ? SizedBox()
-    // FloatingActionButton.extended(
-    //   onPressed: submitData,
-    //   label: Text("Submit"),
-    //   icon: Icon(Icons.send),
-    //   backgroundColor: Colors.green,
-    // )
-    : FloatingActionButton.extended(
-      onPressed: () {
-        setState(() {
-          _selectedIndex = 1;
-          _myPage.jumpToPage(1);
-        });
-      },
-      label: Text("Enter Data"),
-      icon: Icon(Icons.add),
-      backgroundColor: Color(0xff30cbef),
-    );
+    return _selectedIndex == 1
+        ? SizedBox()
+        // FloatingActionButton.extended(
+        //   onPressed: submitData,
+        //   label: Text("Submit"),
+        //   icon: Icon(Icons.send),
+        //   backgroundColor: Colors.green,
+        // )
+        : FloatingActionButton.extended(
+            onPressed: () {
+              setState(() {
+                _selectedIndex = 1;
+                _myPage.jumpToPage(1);
+              });
+            },
+            label: Text("Enter Data"),
+            icon: Icon(Icons.add),
+            backgroundColor: Color(0xff30cbef),
+          );
   }
+
   Map<String, dynamic> allDatas;
   bool keyboardOpen = false;
   int _selectedIndex = 0;
@@ -91,7 +87,7 @@ class _AppPageState extends State<AppPage> {
     allDatas = parameters;
   }
 
-  void submitData() {}
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   PageController _myPage = PageController(initialPage: 0);
   @override
   Widget build(BuildContext context) {
@@ -102,6 +98,7 @@ class _AppPageState extends State<AppPage> {
     }
 
     return Scaffold(
+      key: _scaffoldKey,
       body: PageView(
         controller: _myPage,
         onPageChanged: (int) {
@@ -110,7 +107,7 @@ class _AppPageState extends State<AppPage> {
         children: <Widget>[
           Home(),
           DataCol(
-            submitData: submitData,
+            scakey: _scaffoldKey,
             inputs: inputs,
             waterParameters: waterParameters,
           ),

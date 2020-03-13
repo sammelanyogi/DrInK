@@ -40,7 +40,7 @@ class _HomeState extends State<Home> {
                       height: 25,
                     ),
                     Text(
-                      "  drink",
+                      "  DrInK",
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,

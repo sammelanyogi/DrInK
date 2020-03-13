@@ -1,7 +1,7 @@
 import 'package:DrInK/components/footer.dart';
 import 'package:flutter/material.dart';
-import '../components/buildlogo.dart';
-import '../components/question.dart';
+import 'package:DrInK/components/buildlogo.dart';
+import 'package:DrInK/components/question.dart';
 
 class Login extends StatefulWidget {
   Login({this.checkCredentials, this.goToRegister});
@@ -31,16 +31,20 @@ class _LoginState extends State<Login> {
     if (statusCode == 1000) {
       print("connection error");
       SnackBar snackBar = SnackBar(
-          content: Text("Please Connect to the internet."),
+          content: Text("Please check your internet connection."),
           action: SnackBarAction(
             label: "Okay",
             onPressed: () {},
           ));
       _scaffoldKey.currentState.showSnackBar(snackBar);
     }
-    if (statusCode == 400 || statusCode == 401) {
+    if (statusCode == 401) {
       print("There was an error");
-      _error = "Error in Email or Password.";
+      _error = "Email not registered.";
+    }
+        if (statusCode == 402) {
+      print("There was an error");
+      _error = "Wrong password.";
     }
 
     if (statusCode == 200) {

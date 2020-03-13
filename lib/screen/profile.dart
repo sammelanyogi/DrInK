@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../stacks/profilesetting.dart';
 
 class Profile extends StatefulWidget {
@@ -9,8 +12,27 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  final storage = FlutterSecureStorage();
   void _logout() {
     widget.logout();
+  }
+
+  var userData;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadUserData();
+    });
+  }
+
+  loadUserData() async {
+    var data = await storage.read(key: 'drinkUserInfo');
+    setState(() {
+      userData = json.decode(data);
+    });
+
+    print(userData);
   }
 
   @override
@@ -56,11 +78,16 @@ class _ProfileState extends State<Profile> {
               children: <Widget>[
                 Center(
                   child: Container(
-                    margin: EdgeInsets.only(top: 65.0, bottom: deviceHeight > deviceWidth? 0: paddingTop*3),
+                    margin: EdgeInsets.only(
+                        top: 65.0,
+                        bottom:
+                            deviceHeight > deviceWidth ? 0 : paddingTop * 3),
                     height: deviceHeight > deviceWidth
                         ? deviceHeight * 0.6
-                        : deviceWidth*0.8,
-                    width: deviceHeight > deviceWidth? deviceWidth - paddingTop * 2: deviceWidth-paddingTop*6,
+                        : deviceWidth * 0.8,
+                    width: deviceHeight > deviceWidth
+                        ? deviceWidth - paddingTop * 2
+                        : deviceWidth - paddingTop * 6,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
@@ -79,14 +106,14 @@ class _ProfileState extends State<Profile> {
                             height: deviceWidth * 0.22,
                           ),
                           Text(
-                            "Jane Doe",
+                            userData == null ? "..." : userData['name'],
                             style: TextStyle(
                               color: Color(0xfff7931e),
                               fontSize: 25,
                             ),
                           ),
                           Text(
-                            "Youth",
+                            userData == null ? "..." : userData['type'],
                             style: TextStyle(
                               color: Color(0xff898989),
                               fontSize: 20,
@@ -99,7 +126,7 @@ class _ProfileState extends State<Profile> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
                               Text(
-                                "95",
+                                userData == null ? "...": "${userData['dataCollected']}",
                                 style: TextStyle(
                                   color: Color(0xff5b5b5b),
                                   fontSize: 40,
@@ -129,25 +156,6 @@ class _ProfileState extends State<Profile> {
                           SizedBox(
                             height: deviceHeight * 0.04,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Text(
-                                "Data Not Synced",
-                                style: TextStyle(
-                                  color: Color(0xffe0342f),
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                "Sync Data",
-                                style: TextStyle(
-                                  color: Color(0xff39bf4a),
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
                           SizedBox(
                             height: deviceHeight * 0.04,
                           ),
@@ -156,7 +164,7 @@ class _ProfileState extends State<Profile> {
                             padding: EdgeInsets.symmetric(
                                 horizontal: deviceWidth * 0.2),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(25),
                             ),
                             onPressed: null,
                           ),
@@ -164,9 +172,9 @@ class _ProfileState extends State<Profile> {
                             padding: EdgeInsets.symmetric(
                                 horizontal: deviceWidth * 0.2),
                             onPressed: _logout,
-                            color: Colors.red,
+                            color: Color(0xffFC8D87),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(25),
                             ),
                             child: Text(
                               "Log Out",
@@ -197,7 +205,7 @@ class _ProfileState extends State<Profile> {
                             boxShadow: [
                               BoxShadow(
                                 blurRadius: 5,
-                                color: Color(0xff000000).withOpacity(0.2),
+                                color: Color(0xff000000).withOpacity(0.15),
                                 spreadRadius: 2,
                               ),
                             ],

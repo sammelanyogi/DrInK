@@ -1,38 +1,162 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:geocoder/geocoder.dart';
+
 import '../components/numdata.dart';
 import 'package:flutter/material.dart';
 import '../components/InputData.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import 'package:geolocator/geolocator.dart';
 
+const waterUrl = "http://192.168.1.79:3000/waterdata";
+Future<http.Response> submitWholeData(String url, Map jsonMap) async {
+  http.Response response;
+  print(json.encode(jsonMap));
+  try {
+    response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(jsonMap),
+    );
+  } catch (e) {
+    print(e.toString());
+    response = null;
+  }
+  return response;
+}
+
 class DataCol extends StatefulWidget {
-  DataCol({this.submitData, this.inputs, this.waterParameters});
-  final VoidCallback submitData;
+  DataCol({this.scakey, this.inputs, this.waterParameters});
+  final GlobalKey<ScaffoldState> scakey;
   final List<InputData> inputs;
   final Function(Map<String, dynamic>) waterParameters;
   @override
   _DataColState createState() => _DataColState();
 }
 
+String address;
+
 class _DataColState extends State<DataCol> {
+  int ph, ec, temp, tds, ntu, ecoli, frc;
+  String other;
+  String address, supplyChain;
+  String obDetails;
+  bool loading = false;
+  final storage = FlutterSecureStorage();
   void hereisData(dynamic data) {
     print("The value of ${data.id} is ${data.value}.");
+    if (data.id == "ph") {
+      print("HAHEHA");
+      ph = int.parse(data.value);
+      print(ph);
+    }
+    if (data.id == "ec") {
+      ec = int.parse(data.value);
+      print(ec);
+    }
+    if (data.id == "temp") {
+      temp = int.parse(data.value);
+      print(temp);
+    }
+    if (data.id == "tds") {
+      tds = int.parse(data.value);
+      print(tds);
+    }
+    if (data.id == "ntu") {
+      ntu = int.parse(data.value);
+      print(ntu);
+    }
+    if (data.id == "ecoli") {
+      ecoli = int.parse(data.value);
+      print(ecoli);
+    }
+    if (data.id == "frc") {
+      frc = int.parse(data.value);
+      print(frc);
+    }
+    if (data.id == "other") {
+      other = data.value.toString();
+      print(other);
+    }
   }
 
+  http.Response dataB;
+  String useremail;
+  String error;
   Position _currentPosition;
+  submitData() async {
+    setState(() {
+      loading = true;
+    });
+    var data = await storage.read(key: 'drinkUserInfo');
+    useremail = json.decode(data)['email'];
+    if (ph == null ||
+        ec == null ||
+        temp == null ||
+        tds == null ||
+        ntu == null ||
+        ecoli == null ||
+        frc == null ||
+        other == null ||
+        useremail == null ||
+        address == null ||
+        supplyChain == null ||
+        obDetails == null) {
+      error = "please fill up all data.";
+    } else {
+      dataB = await submitWholeData(waterUrl, {
+        'status': {'location': address, 'supplyChain': supplyChain},
+        'param': {'details': obDetails},
+        'waterParam': {
+          'ph': ph,
+          'ec': ec,
+          'temp': temp,
+          'tds': tds,
+          'ntu': ntu,
+          'ecoli': ecoli,
+          'frc': frc,
+          'other': other
+        },
+        'user': {'email': useremail}
+      });
+      if (dataB.statusCode == 200) {
+        setState(() {
+          loading = false;
+        });
+        SnackBar snackBar = SnackBar(
+          backgroundColor: Colors.green,
+          content: Text("Data Submitted Successfully."),
+          action: SnackBarAction(
+            label: "Okay",
+            onPressed: () {},
+          ),
+        );
+        widget.scakey.currentState.showSnackBar(snackBar);
+      } else {
+        setState(() {
+          loading = false;
+        });
+      }
+    }
+  }
 
-  void _getCurrentLocation() {
+  Future<void> _getCurrentLocation() async {
     final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
-    geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-        .then((Position position) {
-      _currentPosition = position;
-      print(_currentPosition.toString());
-    }).catchError((e) {
-      print(e);
-    });
+    Position position = await geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.best,
+    );
+    _currentPosition = position;
+    print(_currentPosition);
+    var addresses = await Geocoder.local.findAddressesFromCoordinates(
+        Coordinates(position.latitude, position.longitude));
+    print(addresses.first.addressLine);
+    locationCon.text =
+        "${addresses.first.featureName}, ${addresses.first.locality}";
+    address = "${addresses.first.featureName}, ${addresses.first.locality}";
   }
 
   void getTheLocation() {
@@ -52,6 +176,7 @@ class _DataColState extends State<DataCol> {
     }
   }
 
+  TextEditingController locationCon = TextEditingController();
   Future openCameraForImage() async {
     try {
       var image = await ImagePicker.pickImage(source: ImageSource.camera);
@@ -111,12 +236,15 @@ class _DataColState extends State<DataCol> {
                         children: <Widget>[
                           Flexible(
                             child: TextFormField(
+                              controller: locationCon,
                               keyboardType: TextInputType.text,
                               decoration: InputDecoration(
                                 hintText:
                                     "Tap the icon if you are in the survey area.",
                               ),
-                              onChanged: (value) {},
+                              onChanged: (value) {
+                                address = value;
+                              },
                             ),
                           ),
                           IconButton(
@@ -144,7 +272,10 @@ class _DataColState extends State<DataCol> {
                         decoration: InputDecoration(
                           hintText: "eg. Nepal Water Supply Corporation (NWSC)",
                         ),
-                        onChanged: (value) {},
+                        onChanged: (value) {
+                          supplyChain = value;
+                          print(supplyChain);
+                        },
                       ),
                     ],
                   ),
@@ -180,8 +311,13 @@ class _DataColState extends State<DataCol> {
                               child: TextField(
                                 maxLines: 8,
                                 decoration: InputDecoration.collapsed(
-                                    hintText:
-                                        "Write about observation details based on colour, odour or presence of foreign elements."),
+                                  hintText:
+                                      "Write about observation details based on colour, odour or presence of foreign elements.",
+                                ),
+                                onChanged: (value) {
+                                  obDetails = value;
+                                  print(obDetails);
+                                },
                               ),
                             ),
                           ),
@@ -265,6 +401,18 @@ class _DataColState extends State<DataCol> {
                     );
                   },
                 ),
+                Center(
+                  child: FlatButton(
+                    color: Colors.green,
+                    child: loading
+                        ? CircularProgressIndicator()
+                        : Text(
+                            "Submit",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                    onPressed: submitData,
+                  ),
+                )
               ],
             )
           ]),

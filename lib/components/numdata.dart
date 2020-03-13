@@ -3,8 +3,15 @@ import 'package:flutter/rendering.dart';
 import '../components/InputData.dart';
 
 class NumData extends StatefulWidget {
-  NumData({this.id, this.heading, this.textPlace, this.radio, this.options, this.keyboardType, this.dataBack});
-  final String id,heading, textPlace;
+  NumData(
+      {this.id,
+      this.heading,
+      this.textPlace,
+      this.radio,
+      this.options,
+      this.keyboardType,
+      this.dataBack});
+  final String id, heading, textPlace;
   final List<String> options;
   final bool radio, keyboardType;
   final Function(FinalData) dataBack;
@@ -15,45 +22,43 @@ class NumData extends StatefulWidget {
 enum Presence { present, absent, na }
 
 class _NumDataState extends State<NumData> {
-
   Presence _character = Presence.na;
 
-  changeData(dynamic value){
+  changeData(dynamic value) {}
+  void valueControl() {}
 
-  }
-  void valueControl(){
-
-  }
-  
   Widget buildField() {
     if (widget.radio) {
       return Column(
         children: [
-          for (var option in widget.options) ListTile(
-            title: Text(option),
-            leading: Radio(
-              value: Presence.values[widget.options.indexOf(option)],
-              groupValue: _character,
-              onChanged: (Presence value) {
-                setState(() {
-                  _character = value;
-                  print(_character);
-                });
-              },
+          for (var option in widget.options)
+            ListTile(
+              title: Text(option),
+              leading: Radio(
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                value: Presence.values[widget.options.indexOf(option)],
+                groupValue: _character,
+                onChanged: (Presence value) {
+                  setState(() {
+                    _character = value;
+                    print(_character);
+                  });
+                },
+              ),
             ),
-          ),
         ],
       );
     } else
       return TextFormField(
-        keyboardType: widget.keyboardType? TextInputType.text:TextInputType.number,
+        keyboardType:
+            widget.keyboardType ? TextInputType.text : TextInputType.number,
         decoration: InputDecoration(
           hintText: widget.textPlace,
           contentPadding: EdgeInsets.symmetric(vertical: 0),
         ),
-        onChanged: (value){
+        onChanged: (value) {
           print("hello this is ${widget.id}");
-          widget.dataBack(FinalData(widget.id,  value));
+          widget.dataBack(FinalData(widget.id, value));
         },
       );
   }
