@@ -22,6 +22,7 @@ class FooterState extends State<Footer> {
             child: Text(
               widget.text,
               style: TextStyle(
+                fontFamily: 'Myriad',
                 fontSize: 15,
                 color: widget.color == null
                     ? Colors.black.withOpacity(0.2)

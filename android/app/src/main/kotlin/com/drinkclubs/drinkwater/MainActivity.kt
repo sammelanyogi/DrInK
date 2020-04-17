@@ -1,4 +1,4 @@
-package com.example.drinkwater
+package com.drinkclubs.drinkwater
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

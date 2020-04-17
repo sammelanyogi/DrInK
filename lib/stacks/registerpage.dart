@@ -9,7 +9,7 @@ import 'dart:convert';
 
 import '../components/buildlogo.dart';
 
-const registerUrl = "http://192.168.1.79:3000/register";
+const registerUrl = "https://server.drinkclubs.com/register";
 
 Future<http.Response> registerToDrink(String url, Map jsonMap) async {
   http.Response response;
@@ -53,6 +53,10 @@ class _RegisterState extends State<Register> {
       _error1 = null;
     });
   }
+  @override
+  void initState(){
+    super.initState();
+  }
 
   getPassData(List<String> data) {
     if (data[1] == null || data[0] == null) {
@@ -93,9 +97,16 @@ class _RegisterState extends State<Register> {
         'type': userType,
         'password': password
       });
-      print(regBack.statusCode);
+      
       if (regBack == null) {
         print("couldnot connect");
+        SnackBar snackBar = SnackBar(
+            content: Text("Couldnot connect to the server."),
+            action: SnackBarAction(
+              label: "Okay",
+              onPressed: () {},
+            ));
+        _scaffoldKey.currentState.showSnackBar(snackBar);
       } else if (regBack.statusCode == 401) {
         setState(() {
           _error2 = "User already registered.";
@@ -109,7 +120,7 @@ class _RegisterState extends State<Register> {
       } else if (regBack.statusCode == 200) {
         Navigator.of(context).pop();
         SnackBar snackBar = SnackBar(
-            content: Text("Account created successfully."),
+            content: Text("Account created successfully. Please Verify."),
             action: SnackBarAction(
               label: "Okay",
               onPressed: () {},
@@ -124,11 +135,6 @@ class _RegisterState extends State<Register> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    print("THis is called.");
-  }
 
   bool switcher = false;
   void checkForError() {
@@ -220,6 +226,7 @@ class _RegisterState extends State<Register> {
                 child: Text(
                   "Login",
                   style: TextStyle(
+                    fontFamily: 'Myriad',
                     fontSize: 20,
                     color: Colors.blueAccent,
                   ),

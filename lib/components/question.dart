@@ -14,11 +14,12 @@ class _QuestionState extends State<Question> {
       child: Text(
         widget.question,
         style: TextStyle(
-          fontSize: 20,
+          fontFamily: 'Gilroy',
+          fontSize: 18,
           color: Colors.black.withOpacity(0.5),
         ),
       ),
-      padding: EdgeInsets.only(top: 5),
+      padding: EdgeInsets.symmetric(vertical: 10),
     );
   }
 }

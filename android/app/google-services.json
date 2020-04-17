@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "179277890525",
+    "firebase_url": "https://drinkpani-f53ab.firebaseio.com",
+    "project_id": "drinkpani-f53ab",
+    "storage_bucket": "drinkpani-f53ab.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:179277890525:android:5dce0c33152f33140b6c34",
+        "android_client_info": {
+          "package_name": "com.drinkclubs.drinkwater"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "179277890525-3rpmqq7tibdpnm5pi7bt7dk80gdo7lt6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.drinkclubs.drinkwater",
+            "certificate_hash": "78a866afd2f4efb0d1c38931d5d0983aee7e4adb"
+          }
+        },
+        {
+          "client_id": "179277890525-mhiehiroeabqo34gr9m92sd3j1m5j2a4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6vixNgOjvF88okVV5RZZjvd8ioW3Mw14"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "179277890525-mhiehiroeabqo34gr9m92sd3j1m5j2a4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

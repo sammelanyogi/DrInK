@@ -1,19 +1,19 @@
 import 'dart:convert';
 
+import 'package:DrInK/stacks/alldata.dart';
+import 'package:DrInK/stacks/profilesetting.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../stacks/profilesetting.dart';
 import 'package:http/http.dart' as http;
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:DrInK/utils/database_helper.dart';
 
-class Profile extends StatefulWidget {
-  Profile({this.logout});
-  final VoidCallback logout;
-  @override
-  _ProfileState createState() => _ProfileState();
-}
+const apiUrl = "https://server.drinkclubs.com/metadata";
 
-const apiUrl = "http://192.168.1.79:3000/dataCollected";
 Future<http.Response> dataApi(String url, Map jsonMap) async {
   http.Response response;
   print(json.encode(jsonMap));
@@ -32,39 +32,88 @@ Future<http.Response> dataApi(String url, Map jsonMap) async {
   return response;
 }
 
+class Profile extends StatefulWidget {
+  Profile({this.logout});
+
+  final VoidCallback logout;
+
+  @override
+  _ProfileState createState() => _ProfileState();
+}
+
 class _ProfileState extends State<Profile> {
   final storage = FlutterSecureStorage();
-  void _logout() {
-    widget.logout();
+
+  openContact() async {
+    const contactUrl = 'https://drinkclubs.com/contactus';
+    if (await canLaunch(contactUrl)) {
+      await launch(contactUrl);
+    } else {
+      throw 'Could not launch $contactUrl';
+    }
   }
 
-  var userData;
+  DatabaseHelper helper = DatabaseHelper();
+  int a;
+  var data, userData, response;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadUserData();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      data = await storage.read(key: 'drinkUserInfo');
+      a = await helper.getCount();
+      if (this.mounted) {
+        setState(() {
+          userData = json.decode(data);
+          no = a;
+        });
+      }
     });
   }
 
-  int dataCol;
-  http.Response response;
-  loadUserData() async {
-    var data = await storage.read(key: 'drinkUserInfo');
-    setState(() {
-      userData = json.decode(data);
-    });
-    bringdata();
-    print(userData);
+  moreInfo() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AllData(
+          email: userData['email'],
+          password: userData['password'],
+        ),
+      ),
+    );
   }
 
-  bringdata() async {
-    response = await dataApi(apiUrl, {'email': userData['email']});
+  goToSetting() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Settings(
+          photo: userData['photo'],
+          name: userData['name'],
+        ),
+      ),
+    );
+  }
+
+  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  int no = 0;
+
+  Future<void> refreshPage() async {
+    response = await dataApi(
+      apiUrl,
+      {
+        'email': userData['email'],
+        'password': userData['password'],
+      },
+    );
     if (response != null) {
-      print(response.body);
       setState(() {
-        dataCol = json.decode(response.body)['number'];
+        userData = json.decode(response.body);
       });
+    }
+    if (!mapEquals(userData, json.decode(data))) {
+      storage.write(key: 'drinkUserInfo', value: json.encode(userData));
     }
   }
 
@@ -72,182 +121,233 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     double paddingTop = MediaQuery.of(context).padding.top;
     double deviceWidth = MediaQuery.of(context).size.width;
-    double deviceHeight = MediaQuery.of(context).size.height;
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xff30cbef), Colors.white],
-        ),
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: paddingTop,
-            ),
-            SizedBox(
-              height: deviceHeight * 0.08,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  IconButton(
-                    color: Colors.white,
-                    icon: Icon(Icons.settings),
-                    onPressed: () {},
+    return Scaffold(
+      key: _scaffoldKey,
+      body: RefreshIndicator(
+        onRefresh: refreshPage,
+        child: CustomScrollView(
+          physics: BouncingScrollPhysics(),
+          slivers: <Widget>[
+            SliverAppBar(
+              expandedHeight: deviceWidth * 0.33 + paddingTop * 3.1,
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.black54,
                   ),
-                ],
+                  onPressed: goToSetting,
+                )
+              ],
+              pinned: true,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              elevation: 1,
+              flexibleSpace: FlexibleSpaceBar(
+                centerTitle: true,
+                title: Text(
+                  userData == null ? "..." : userData['name'],
+                  style: GoogleFonts.poppins(
+                    color: Color(0xfff7931e),
+                  ),
+                ),
+                background: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    margin: EdgeInsets.only(bottom: paddingTop * 2.5),
+                    height: deviceWidth * 0.33,
+                    width: deviceWidth * 0.33,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(deviceWidth * 0.1),
+                      color: Colors.white.withOpacity(0.9),
+                      shape: BoxShape.rectangle,
+                    ),
+                    child: Container(
+                      margin: EdgeInsets.all(deviceWidth * 0.01),
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.circular(deviceWidth * 0.1),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 5,
+                            color: Color(0xff000000).withOpacity(0.15),
+                            spreadRadius: 2,
+                          ),
+                        ],
+                        color: Colors.white,
+                        shape: BoxShape.rectangle,
+                        image: DecorationImage(
+                          fit: BoxFit.contain,
+                          image: AssetImage('assets/images/avatar.png'),
+                        ),
+                      ),
+                      child: userData != null
+                          ? ClipRRect(
+                              borderRadius:
+                                  BorderRadius.circular(deviceWidth * 0.1),
+                              child: CachedNetworkImage(
+                                fit: BoxFit.fill,
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                imageUrl: userData['photo'],
+                              ),
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
               ),
             ),
-            Stack(
-              children: <Widget>[
-                Center(
-                  child: Container(
-                    margin: EdgeInsets.only(
-                        top: 65.0,
-                        bottom:
-                            deviceHeight > deviceWidth ? 0 : paddingTop * 3),
-                    height: deviceHeight > deviceWidth
-                        ? deviceHeight * 0.6
-                        : deviceWidth * 0.8,
-                    width: deviceHeight > deviceWidth
-                        ? deviceWidth - paddingTop * 2
-                        : deviceWidth - paddingTop * 6,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 5,
-                          color: Color(0xff000000).withOpacity(0.2),
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Column(
+            SliverPadding(
+              padding: EdgeInsets.only(top: paddingTop),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate(
+                  [
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: deviceWidth * 0.1, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          SizedBox(
-                            height: deviceWidth * 0.22,
-                          ),
                           Text(
-                            userData == null ? "..." : userData['name'],
-                            style: GoogleFonts.poppins(
-                              color: Color(0xfff7931e),
-                              fontSize: 25,
-                            ),
-                          ),
-                          Text(
-                            userData == null ? "..." : userData['type'],
-                            style: GoogleFonts.poppins(
-                              color: Color(0xff898989),
+                            "User Type",
+                            style: TextStyle(
+                              color: Color(0xff5b5b5b),
+                              fontFamily: 'Gilroy',
                               fontSize: 20,
                             ),
                           ),
-                          SizedBox(
-                            height: deviceHeight * 0.06,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Text(
-                                dataCol == null ? "..." : "$dataCol",
-                                style: TextStyle(
-                                  color: Color(0xff5b5b5b),
-                                  fontSize: 40,
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    "Data Collected",
-                                    style: TextStyle(
-                                      color: Color(0xff5b5b5b),
-                                      fontSize: 22,
-                                    ),
-                                  ),
-                                  Text(
-                                    "More Information",
-                                    style: TextStyle(
-                                      color: Color(0xff30cbef),
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                          SizedBox(
-                            height: deviceHeight * 0.04,
-                          ),
-                          SizedBox(
-                            height: deviceHeight * 0.04,
-                          ),
-                          OutlineButton(
-                            child: Text("Contact Us"),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: deviceWidth * 0.2),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
+                          Text(
+                            userData == null ? "..." : "${userData['type']}",
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontFamily: 'Myriad',
+                              fontSize: 20,
                             ),
-                            onPressed: null,
                           ),
-                          FlatButton(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: deviceWidth * 0.2),
-                            onPressed: _logout,
-                            color: Color(0xffFC8D87),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: Text(
-                              "Log Out",
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          )
                         ],
                       ),
                     ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Container(
-                    height: deviceWidth * 0.4,
-                    width: deviceWidth * 0.4,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Container(
-                        height: deviceWidth * 0.36,
-                        width: deviceWidth * 0.36,
-                        decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 5,
-                                color: Color(0xff000000).withOpacity(0.15),
-                                spreadRadius: 2,
-                              ),
-                            ],
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              fit: BoxFit.contain,
-                              image: AssetImage('assets/images/avatar.png'),
-                            )),
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: deviceWidth * 0.1),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            "Data Collected",
+                            style: TextStyle(
+                              color: Color(0xff5b5b5b),
+                              fontFamily: 'Gilroy',
+                              fontSize: 20,
+                            ),
+                          ),
+                          Text(
+                            userData == null
+                                ? "..."
+                                : "${userData['dataCollected']}",
+                            style: TextStyle(
+                              color: Color(0xff5b5b5b),
+                              fontSize: 30,
+                              fontFamily: 'Myriad',
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: deviceWidth * 0.1),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            "Data Locally Saved",
+                            style: TextStyle(
+                              color: Color(0xff5b5b5b),
+                              fontFamily: 'Gilroy',
+                              fontSize: 20,
+                            ),
+                          ),
+                          Text(
+                            "$no",
+                            style: TextStyle(
+                              color: Color(0xff5b5b5b),
+                              fontSize: 30,
+                              fontFamily: 'Myriad',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: paddingTop),
+                      child: Divider(
+                        thickness: 8,
+                      ),
+                    ),
+                    InkWell(
+                      onTap: moreInfo,
+                      child: ListTile(
+                        leading: Icon(
+                          IconData(
+                            0xf44c,
+                            fontFamily: CupertinoIcons.iconFont,
+                            fontPackage: CupertinoIcons.iconFontPackage,
+                          ),
+                          color: Colors.blue,
+                        ),
+                        title: Text("Data Information"),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: openContact,
+                      child: ListTile(
+                        leading: Icon(
+                          IconData(
+                            0xf3fb,
+                            fontFamily: CupertinoIcons.iconFont,
+                            fontPackage: CupertinoIcons.iconFontPackage,
+                          ),
+                          color: Colors.green,
+                        ),
+                        title: Text("Contact Us"),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: openContact,
+                      child: ListTile(
+                        leading: Icon(
+                          IconData(
+                            0xf445,
+                            fontFamily: CupertinoIcons.iconFont,
+                            fontPackage: CupertinoIcons.iconFontPackage,
+                          ),
+                          color: Colors.orange,
+                        ),
+                        title: Text("About and FAQ"),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: widget.logout,
+                      child: ListTile(
+                        leading: Icon(
+                          IconData(
+                            0xf385,
+                            fontFamily: CupertinoIcons.iconFont,
+                            fontPackage: CupertinoIcons.iconFontPackage,
+                          ),
+                          color: Colors.red,
+                        ),
+                        title: Text("Log Out"),
+                      ),
+                    ),
+                    SizedBox(
+                      height: deviceWidth * 0.33 + paddingTop * 3.1,
+                    )
+                  ],
                 ),
-              ],
-            ),
+              ),
+            )
           ],
         ),
       ),

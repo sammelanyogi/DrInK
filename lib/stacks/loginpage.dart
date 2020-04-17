@@ -2,6 +2,7 @@ import 'package:DrInK/components/footer.dart';
 import 'package:flutter/material.dart';
 import 'package:DrInK/components/buildlogo.dart';
 import 'package:DrInK/components/question.dart';
+import 'package:DrInK/stacks/forgot.dart';
 
 class Login extends StatefulWidget {
   Login({this.checkCredentials, this.goToRegister});
@@ -29,7 +30,6 @@ class _LoginState extends State<Login> {
       _loading = false;
     });
     if (statusCode == 1000) {
-      print("connection error");
       SnackBar snackBar = SnackBar(
           content: Text("Please check your internet connection."),
           action: SnackBarAction(
@@ -37,14 +37,18 @@ class _LoginState extends State<Login> {
             onPressed: () {},
           ));
       _scaffoldKey.currentState.showSnackBar(snackBar);
-    }
-    if (statusCode == 401) {
-      print("There was an error");
+    } else if (statusCode == 401) {
       _error = "Email not registered.";
-    }
-        if (statusCode == 402) {
-      print("There was an error");
+    } else if (statusCode == 402) {
       _error = "Wrong password.";
+    } else if (statusCode == 403) {
+      SnackBar snackBar = SnackBar(
+          content: Text("Please verify your email."),
+          action: SnackBarAction(
+            label: "Okay",
+            onPressed: () {},
+          ));
+      _scaffoldKey.currentState.showSnackBar(snackBar);
     }
 
     if (statusCode == 200) {
@@ -60,6 +64,15 @@ class _LoginState extends State<Login> {
       email = emailControl.text;
       password = passControl.text;
     });
+  }
+
+  void goToForgot() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Forgot(),
+      ),
+    );
   }
 
   void createAccountController() {}
@@ -135,10 +148,11 @@ class _LoginState extends State<Login> {
               ),
               FlatButton(
                 child: Text(
-                  "Forgot Password",
-                  style: TextStyle(color: Colors.blueAccent),
+                  "Forgot Password?",
+                  style:
+                      TextStyle(color: Colors.blueAccent, fontFamily: 'Myriad'),
                 ),
-                onPressed: null,
+                onPressed: goToForgot,
               ),
               FlatButton(
                 padding: EdgeInsets.symmetric(horizontal: deviceHeight * 0.1),
@@ -154,6 +168,7 @@ class _LoginState extends State<Login> {
                     : Text(
                         "Login",
                         style: TextStyle(
+                          fontFamily: 'Myriad',
                           fontSize: 20,
                           color: Colors.black.withOpacity(0.7),
                         ),
@@ -181,6 +196,7 @@ class _LoginState extends State<Login> {
                 child: Text(
                   "Create an account",
                   style: TextStyle(
+                    fontFamily: 'Myriad',
                     fontSize: 20,
                     color: Colors.blueAccent,
                   ),

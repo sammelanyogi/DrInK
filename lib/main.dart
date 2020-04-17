@@ -23,10 +23,7 @@ class _MyAppState extends State<MyApp> {
   bool loading = true;
   Future<bool> auth() async {
     jwt = await storage.read(key: 'drinkUserInfo');
-    if (jwt == null) {
-      return false;
-    } else
-      return true;
+    return jwt==null?  false: true;
   }
 
   void _signInDone() async {
@@ -36,8 +33,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   _signOutDone() {
-    print("THis is jwt");
-    print(jwt);
     storage.delete(key: 'drinkUserInfo');
 
     setState(() {
@@ -47,10 +42,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<Widget> getPage() async {
     _auth = await auth();
-    if (_auth)
-      return AppPage(logout: _signOutDone);
-    else
-      return LoginPage(signedIn: _signInDone);
+    return _auth ? AppPage(logout: _signOutDone):LoginPage(signedIn: _signInDone);
   }
 
   @override
@@ -63,7 +55,8 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: FutureBuilder<Widget>(
           future: getPage(),
-          builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+          builder: ( context,  snapshot) {
+            
             if (snapshot.hasData) {
               return snapshot.data;
             } else if (snapshot.hasError) {

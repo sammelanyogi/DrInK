@@ -1,43 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import './components/InputData.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'screen/profile.dart';
 import 'screen/home.dart';
 import 'screen/data.dart';
-
-List<InputData> inputs = [
-  InputData(id: "ph", heading: "pH Value", textPlace: "Enter pH Value"),
-  InputData(
-      id: "ec",
-      heading: "Electric Conductivity (EC)",
-      textPlace: "Enter Electric Conductivity"),
-  InputData(
-      id: "temp",
-      heading: "Temperature",
-      textPlace: "Enter Temperature in degree celcius"),
-  InputData(
-      id: "tds",
-      heading: "Total Dissolved Solids (TDS)",
-      textPlace: "Enter TDS value"),
-  InputData(
-      id: "ntu", heading: "Turbidity (NTU)", textPlace: "Enter the NTU value"),
-  InputData.radio(
-      id: 'ecolis',
-      options: ["Present", "Absent", "N/A"],
-      heading: "Presence or Absence of Fecal Coliforms (E-Coli)",
-      radio: true),
-  InputData(
-      id: "ecoli", heading: "E-Coli Count", textPlace: "Enter count value"),
-  InputData(
-      id: "frc",
-      heading: "Free Residual Chlorine (FRC)",
-      textPlace: "Enter FRC"),
-  InputData.text(
-      id: "other",
-      heading: "Other Parameters",
-      textPlace: "Specify if there are any other parameters"),
-];
 
 class AppPage extends StatefulWidget {
   AppPage({this.logout});
@@ -47,9 +13,8 @@ class AppPage extends StatefulWidget {
 }
 
 class _AppPageState extends State<AppPage> {
-  void _logout() {
-    widget.logout();
-  }
+  bool keyboardOpen = false;
+  int _selectedIndex = 0;
 
   Widget buildFloatingButton() {
     if (keyboardOpen) {
@@ -64,15 +29,23 @@ class _AppPageState extends State<AppPage> {
                 _myPage.jumpToPage(1);
               });
             },
-            label: Text("Enter Data", style: GoogleFonts.poppins(),),
-            icon: Icon(Icons.add),
+            label: Text(
+              "Enter Data",
+              style:
+                  TextStyle(fontFamily: 'Gilroy', fontWeight: FontWeight.w500),
+            ),
+            icon: Icon(
+              IconData(
+                0xf37e,
+                fontFamily: CupertinoIcons.iconFont,
+                fontPackage: CupertinoIcons.iconFontPackage,
+              ),
+            ),
             backgroundColor: Color(0xff30cbef),
           );
   }
 
-  Map<String, dynamic> allDatas;
-  bool keyboardOpen = false;
-  int _selectedIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -81,10 +54,6 @@ class _AppPageState extends State<AppPage> {
         setState(() => keyboardOpen = visible);
       },
     );
-  }
-
-  waterParameters(Map<String, dynamic> parameters) {
-    allDatas = parameters;
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -101,17 +70,10 @@ class _AppPageState extends State<AppPage> {
       key: _scaffoldKey,
       body: PageView(
         controller: _myPage,
-        onPageChanged: (int) {
-          print('Page Changes to index $int');
-        },
         children: <Widget>[
           Home(),
-          DataCol(
-            scakey: _scaffoldKey,
-            inputs: inputs,
-            waterParameters: waterParameters,
-          ),
-          Profile(logout: _logout),
+          DataCol(),
+          Profile(logout: widget.logout),
         ],
         physics: NeverScrollableScrollPhysics(),
       ),
@@ -126,7 +88,13 @@ class _AppPageState extends State<AppPage> {
               color: getColor(0),
               iconSize: 35,
               padding: const EdgeInsets.all(10.0),
-              icon: Icon(Icons.home),
+              icon: Icon(
+                IconData(
+                  0xf391,
+                  fontFamily: CupertinoIcons.iconFont,
+                  fontPackage: CupertinoIcons.iconFontPackage,
+                ),
+              ),
               onPressed: () {
                 setState(() {
                   _selectedIndex = 0;
@@ -138,7 +106,13 @@ class _AppPageState extends State<AppPage> {
               color: getColor(2),
               iconSize: 35,
               padding: const EdgeInsets.all(10.0),
-              icon: Icon(Icons.person),
+              icon: Icon(
+                IconData(
+                  0xf419,
+                  fontFamily: CupertinoIcons.iconFont,
+                  fontPackage: CupertinoIcons.iconFontPackage,
+                ),
+              ),
               onPressed: () {
                 setState(() {
                   _selectedIndex = 2;

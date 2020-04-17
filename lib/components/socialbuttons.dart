@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SocialButtons extends StatefulWidget {
   SocialButtons({this.google, this.facebook});
@@ -12,44 +13,22 @@ class _SocialButtonsState extends State<SocialButtons> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        OutlineButton(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Image(
-                image: AssetImage('assets/images/google.png'),
-                height: 20,
-                width: 20,
-              ),
-              Text(
-                "Sign in with Google",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black38
-                ),
-              ),
-            ],
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          onPressed: widget.google,
-        ),
-        FlatButton(
+        RaisedButton(
+          onPressed: widget.facebook,
           color: Color(0xff3b5998),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Image(
-                image: AssetImage('assets/images/facebook.jpg'),
-                height: 20,
-                width: 20,
+              FaIcon(
+                FontAwesomeIcons.facebookF,
+                color: Colors.white,
               ),
               Text(
                 "Sign in with Facebook",
                 style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white
+                  fontFamily: 'Gilroy',
+                  fontSize: 16,
+                  color: Colors.white.withOpacity(0.85),
                 ),
               ),
             ],
@@ -57,7 +36,31 @@ class _SocialButtonsState extends State<SocialButtons> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          onPressed: widget.facebook,
+        ),
+        RaisedButton(
+          onPressed: widget.google,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              SizedBox(
+                width: 20,
+                child: Image(
+                  image: AssetImage("assets/images/google.png"),
+                ),
+              ),
+              Text(
+                "Sign in with Google",
+                style: TextStyle(
+                  fontFamily: 'Gilroy',
+                  fontSize: 16,
+                  color: Colors.black45,
+                ),
+              ),
+            ],
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       ],
     );

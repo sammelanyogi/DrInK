@@ -1,6 +1,8 @@
 import 'package:DrInK/components/socialbuttons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
@@ -9,15 +11,8 @@ import 'components/question.dart';
 import 'stacks/loginpage.dart';
 import 'stacks/registerpage.dart';
 
-const loginUrl = "http://192.168.1.79:3000/login";
-
-class LoginPage extends StatefulWidget {
-  LoginPage({this.signedIn, this.userData});
-  final VoidCallback signedIn;
-  final Function(List<String>) userData;
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
+const loginUrl = "https://server.drinkclubs.com/login";
+const googleSign = "https://server.drinkclubs.com/socialuser";
 
 Future<http.Response> loginRequest(String url, Map jsonMap) async {
   http.Response response;
@@ -34,16 +29,30 @@ Future<http.Response> loginRequest(String url, Map jsonMap) async {
   return response;
 }
 
+class LoginPage extends StatefulWidget {
+  LoginPage({this.signedIn, this.userData});
+
+  final VoidCallback signedIn;
+  final Function(List<String>) userData;
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
 class _LoginPageState extends State<LoginPage> {
-  http.Response loginReturn;
-  int userType = 3;
+  bool loading = false;
+  var loginReturn, googleReturn, fbReturn;
   final storage = FlutterSecureStorage();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  GoogleSignIn _googleSignIn = GoogleSignIn(scopes: [
-    'email',
-    'https://www.googleapis.com/auth/contacts.readonly',
-  ]);
-  Future<int> checkForCredentials(List<String> credentials) async {
+  GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: [
+      'email',
+      "https://www.googleapis.com/auth/userinfo.profile",
+    ],
+  );
+  FacebookLogin fbLogin = FacebookLogin();
+
+  checkForCredentials(List<String> credentials) async {
     loginReturn = await loginRequest(
       loginUrl,
       {'email': credentials[0], 'password': credentials[1]},
@@ -51,36 +60,101 @@ class _LoginPageState extends State<LoginPage> {
     if (loginReturn == null) {
       return 1000;
     }
-    print(loginReturn.body);
     if (loginReturn.statusCode == 200) {
       storage.write(key: 'drinkUserInfo', value: loginReturn.body);
-      _goToMain();
+      widget.signedIn();
     }
     return loginReturn.statusCode;
   }
 
-  void _goToMain() {
-    widget.signedIn();
+  SnackBar goSnack(String snackString) {
+    return SnackBar(
+        content: Text(snackString),
+        action: SnackBarAction(
+          label: "Okay",
+          onPressed: () {},
+        ));
   }
 
-  void socialTypeGoogle() {
-    continueWithSocial("Google");
+  socialTypeGoogle() async {
+    var googleData = await _googleSignIn.signIn();
+    if (googleData == null) {
+      _scaffoldKey.currentState.showSnackBar(goSnack("Network Error."));
+      return;
+    }
+    setState(() {
+      loading = true;
+    });
+    googleReturn = await loginRequest(googleSign, {
+      'email': googleData.email,
+      'name': googleData.displayName,
+      'type': "General",
+      'photo': googleData.photoUrl,
+      'social': 'google'
+    });
+    setState(() {
+      loading = false;
+    });
+    if (googleReturn == null) {
+      _scaffoldKey.currentState.showSnackBar(goSnack("Network Error."));
+    } else if (googleReturn.statusCode == 400) {
+      _scaffoldKey.currentState.showSnackBar(goSnack("Server Error."));
+    } else if (googleReturn.statusCode == 200) {
+      print(googleReturn.body.toString());
+      storage.write(key: 'drinkUserInfo', value: googleReturn.body);
+      widget.signedIn();
+    } else {
+      _scaffoldKey.currentState.showSnackBar(goSnack("Unknown Server Error."));
+    }
   }
 
-  void socialTypeFacebook() {
-    continueWithSocial("Facebook");
-  }
-
-  Future<void> continueWithSocial(String type) async {
-    if (type == "Google") {
-      try {
-        await _googleSignIn.signIn();
-        print("Sammelan");
-      } catch (err) {
-        print(err);
-      }
-    } else if (type == "Facebook") {
-      _goToMain();
+  void socialTypeFacebook() async {
+    var fbData = await fbLogin.logIn(['email', 'public_profile']);
+    switch (fbData.status) {
+      case FacebookLoginStatus.error:
+        _scaffoldKey.currentState.showSnackBar(goSnack("Facebook Error."));
+        break;
+      case FacebookLoginStatus.cancelledByUser:
+        _scaffoldKey.currentState.showSnackBar(goSnack("Cancelled by user."));
+        break;
+      case FacebookLoginStatus.loggedIn:
+        {
+          setState(() {
+            loading = true;
+          });
+          var graphResponse = await http.get(
+            'https://graph.facebook.com/v2.12/me?fields=name,email,picture.width(400)&access_token=${fbData.accessToken.token}',
+          );
+          if (graphResponse == null) {
+            print("cannot continue with facebook");
+          } else {
+            var profile = json.decode(graphResponse.body);
+            print(profile.toString());
+            fbReturn = await loginRequest(googleSign, {
+              'email': profile['email'],
+              'name': profile['name'],
+              'type': "General",
+              'photo': profile['picture']['data']['url'],
+              'social': 'facebook'
+            });
+            setState(() {
+              loading = false;
+            });
+            if (fbReturn == null) {
+              _scaffoldKey.currentState.showSnackBar(goSnack("Network Error."));
+            } else if (fbReturn.statusCode == 400) {
+              _scaffoldKey.currentState.showSnackBar(goSnack("Server Error."));
+            } else if (fbReturn.statusCode == 200) {
+              print(fbReturn.body.toString());
+              storage.write(key: 'drinkUserInfo', value: fbReturn.body);
+              widget.signedIn();
+            } else {
+              _scaffoldKey.currentState
+                  .showSnackBar(goSnack("Unknown Server Error."));
+            }
+          }
+        }
+        break;
     }
   }
 
@@ -99,7 +173,12 @@ class _LoginPageState extends State<LoginPage> {
   void goToRegister() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Register(goToLogin: goToLogin, scakey: _scaffoldKey)),
+      MaterialPageRoute(
+        builder: (context) => Register(
+          goToLogin: goToLogin,
+          scakey: _scaffoldKey,
+        ),
+      ),
     );
   }
 
@@ -118,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Scaffold(
         key: _scaffoldKey,
         resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.white60,
+        backgroundColor: Colors.white70,
         body: Container(
           width: deviceWidth,
           child: Column(
@@ -144,7 +223,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: Text(
                   "Create an Account",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontFamily: 'Myriad',
+                    fontSize: 18,
                     color: Colors.white,
                   ),
                 ),
@@ -158,11 +238,15 @@ class _LoginPageState extends State<LoginPage> {
                 child: Text(
                   "Login",
                   style: TextStyle(
+                    fontFamily: 'Myriad',
                     fontSize: 24,
                     color: Colors.blueAccent,
                   ),
                 ),
                 onPressed: goToLogin,
+              ),
+              Container(
+                child: loading ? CircularProgressIndicator() : SizedBox(),
               ),
               Expanded(
                 child: Align(
@@ -171,7 +255,7 @@ class _LoginPageState extends State<LoginPage> {
                     padding: EdgeInsets.all(20.0),
                     child: Text(
                       "DrInK - Drinking Water Information Kit",
-                      style: TextStyle(color: Colors.black54),
+                      style: TextStyle(fontFamily: 'Myriad' ,color: Colors.black45),
                     ),
                   ),
                 ),

@@ -1,77 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../components/InputData.dart';
 
 class NumData extends StatefulWidget {
-  NumData(
-      {this.id,
-      this.heading,
-      this.textPlace,
-      this.radio,
-      this.options,
-      this.keyboardType,
-      this.dataBack});
-  final String id, heading, textPlace;
+  NumData({
+    this.contro,
+    this.id,
+    this.heading,
+    this.textPlace,
+    this.radio,
+    this.options,
+    this.keyboardType,
+    this.error,
+  });
+  final TextEditingController contro;
+  final String id, heading, textPlace, error;
   final List<String> options;
   final bool radio, keyboardType;
-  final Function(FinalData) dataBack;
   @override
   _NumDataState createState() => _NumDataState();
 }
 
-enum Presence { present, absent, na }
-
 class _NumDataState extends State<NumData> {
-  Presence _character = Presence.na;
-
-  changeData(dynamic value) {}
-  void valueControl() {}
 
   Widget buildField() {
     if (widget.radio) {
       return Column(
         children: [
           for (var option in widget.options)
-            ListTile(
+            RadioListTile(
               title: Text(option),
-              leading: Radio(
-                value: Presence.values[widget.options.indexOf(option)],
-                groupValue: _character,
-                onChanged: (Presence value) {
-                  setState(() {
-                    _character = value;
-                  });
-                  widget.dataBack(FinalData(widget.id, value));
-                },
-              ),
+              value: option,
+              groupValue: widget.contro.text,
+              onChanged: (value) {
+                setState(() {
+                  widget.contro.text = value;
+                });
+              },
             ),
         ],
       );
     } else
       return TextFormField(
+        textInputAction: TextInputAction.next,
+        onFieldSubmitted: (_)=>FocusScope.of(context).nextFocus(),
+        controller: widget.contro,
         keyboardType:
             widget.keyboardType ? TextInputType.text : TextInputType.number,
         decoration: InputDecoration(
+          errorText: widget.error,
           hintText: widget.textPlace,
           contentPadding: EdgeInsets.symmetric(vertical: 0),
         ),
-        onChanged: (value) {
-          widget.dataBack(FinalData(widget.id, value));
-        },
       );
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).padding.top * 0.5),
+      padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).padding.top * 0.5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
             widget.heading,
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontFamily: 'Gilroy',
+              fontWeight: FontWeight.w500,
+              fontSize: 18,
+            ),
           ),
           buildField(),
         ],
