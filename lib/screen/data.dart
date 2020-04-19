@@ -398,14 +398,14 @@ class _DataColState extends State<DataCol> {
       desiredAccuracy: LocationAccuracy.best,
     );
     _currentPosition = position;
+    setState(() {
+      coordinate = "${position.latitude}, ${position.longitude}";
+    });
     var addresses = await Geocoder.local.findAddressesFromCoordinates(
       Coordinates(position.latitude, position.longitude),
     );
     locationCon.text =
         "${addresses.first.featureName}, ${addresses.first.locality}";
-    setState(() {
-      coordinate = "${position.latitude}, ${position.longitude}";
-    });
   }
 
   File _image;

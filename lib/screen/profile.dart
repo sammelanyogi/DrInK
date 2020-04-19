@@ -62,12 +62,15 @@ class _ProfileState extends State<Profile> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       data = await storage.read(key: 'drinkUserInfo');
+      print(data);
       a = await helper.getCount();
       if (this.mounted) {
         setState(() {
+
           userData = json.decode(data);
           no = a;
         });
+        
       }
     });
   }
@@ -164,8 +167,7 @@ class _ProfileState extends State<Profile> {
                     child: Container(
                       margin: EdgeInsets.all(deviceWidth * 0.01),
                       decoration: BoxDecoration(
-                        borderRadius:
-                            BorderRadius.circular(deviceWidth * 0.1),
+                        borderRadius: BorderRadius.circular(deviceWidth * 0.1),
                         boxShadow: [
                           BoxShadow(
                             blurRadius: 5,
@@ -181,16 +183,18 @@ class _ProfileState extends State<Profile> {
                         ),
                       ),
                       child: userData != null
-                          ? ClipRRect(
-                              borderRadius:
-                                  BorderRadius.circular(deviceWidth * 0.1),
-                              child: CachedNetworkImage(
-                                fit: BoxFit.fill,
-                                placeholder: (context, url) =>
-                                    CircularProgressIndicator(),
-                                imageUrl: userData['photo'],
-                              ),
-                            )
+                          ? userData['photo'].trim()!= "" 
+                              ? ClipRRect(
+                                  borderRadius:
+                                      BorderRadius.circular(deviceWidth * 0.1),
+                                  child: CachedNetworkImage(
+                                    fit: BoxFit.fill,
+                                    placeholder: (context, url) =>
+                                        CircularProgressIndicator(),
+                                    imageUrl: userData['photo'],
+                                  ),
+                                )
+                              : null
                           : null,
                     ),
                   ),
@@ -203,8 +207,8 @@ class _ProfileState extends State<Profile> {
                 delegate: SliverChildListDelegate(
                   [
                     Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: deviceWidth * 0.1, vertical: 8),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: deviceWidth * 0.1, vertical: 8),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[

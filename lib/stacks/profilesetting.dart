@@ -18,6 +18,7 @@ class SettingsState extends State<Settings> {
     super.initState();
   }
 
+  String error;
   @override
   Widget build(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
@@ -50,15 +51,18 @@ class SettingsState extends State<Settings> {
                     image: AssetImage('assets/images/avatar.png'),
                   ),
                 ),
-                child: CachedNetworkImage(
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => CircularProgressIndicator(),
-                  imageUrl: widget.photo,
-                  errorWidget: (context, err, obj) => SizedBox(
-                    height: 0,
-                    width: 0,
-                  ),
-                ),
+                child: widget.photo.trim() != ""
+                    ? CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) =>
+                            CircularProgressIndicator(),
+                        imageUrl: widget.photo,
+                        errorWidget: (context, err, obj) => SizedBox(
+                          height: 0,
+                          width: 0,
+                        ),
+                      )
+                    : null,
               ),
             ),
           ),
@@ -71,19 +75,24 @@ class SettingsState extends State<Settings> {
                   controller: nameController,
                   keyboardType: TextInputType.text,
                   decoration: InputDecoration(
+                    errorText: error,
                     hintText: "Enter Your Name",
                   ),
                 ),
-                RaisedButton(color: Colors.green,
+                RaisedButton(
+                  color: Colors.green,
                   child: Text(
                     "Save",
                     style: TextStyle(
-                      fontFamily: 'Myriad',
-                      color: Colors.white,
-                      fontSize: 18
-                    ),
+                        fontFamily: 'Myriad',
+                        color: Colors.white,
+                        fontSize: 18),
                   ),
-                  onPressed: (){},
+                  onPressed: () {
+                    setState(() {
+                      error = "This option is not available now.";
+                    });
+                  },
                 )
               ]),
             ),

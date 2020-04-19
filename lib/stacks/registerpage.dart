@@ -95,11 +95,11 @@ class _RegisterState extends State<Register> {
         'email': email,
         'name': fullname,
         'type': userType,
-        'password': password
+        'password': password,
+        'photo': ""
       });
       
       if (regBack == null) {
-        print("couldnot connect");
         SnackBar snackBar = SnackBar(
             content: Text("Couldnot connect to the server."),
             action: SnackBarAction(

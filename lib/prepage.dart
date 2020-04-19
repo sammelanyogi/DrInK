@@ -77,14 +77,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   socialTypeGoogle() async {
+    setState(() {
+      loading = true;
+    });
     var googleData = await _googleSignIn.signIn();
     if (googleData == null) {
       _scaffoldKey.currentState.showSnackBar(goSnack("Network Error."));
       return;
     }
-    setState(() {
-      loading = true;
-    });
     googleReturn = await loginRequest(googleSign, {
       'email': googleData.email,
       'name': googleData.displayName,
@@ -126,7 +126,8 @@ class _LoginPageState extends State<LoginPage> {
             'https://graph.facebook.com/v2.12/me?fields=name,email,picture.width(400)&access_token=${fbData.accessToken.token}',
           );
           if (graphResponse == null) {
-            print("cannot continue with facebook");
+            _scaffoldKey.currentState
+                .showSnackBar(goSnack("cannot continue with facebook"));
           } else {
             var profile = json.decode(graphResponse.body);
             print(profile.toString());
@@ -255,7 +256,8 @@ class _LoginPageState extends State<LoginPage> {
                     padding: EdgeInsets.all(20.0),
                     child: Text(
                       "DrInK - Drinking Water Information Kit",
-                      style: TextStyle(fontFamily: 'Myriad' ,color: Colors.black45),
+                      style: TextStyle(
+                          fontFamily: 'Myriad', color: Colors.black45),
                     ),
                   ),
                 ),
